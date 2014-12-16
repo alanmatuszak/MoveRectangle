@@ -12,34 +12,37 @@ var movingDown = true;
 function showInstructions() {
     getCanvas();
     ctx.font = "12px Arial";
-    ctx.fillText("Press any key to animate a rectangle", 10, 50);
+    ctx.fillText("Press any key to animate a rectangle.", 10, 50);
 }
 
 function OnKeyPressHandler(event) {
+    
+    clearCanvas();
+    
     // Start or stop the animation when a key is pressed
-    if (running) {  // stop the animation
+    if (!running) {
+        // Start the animation
+        setStartingPosition();
+        // gets the timer running
+        timerID = setInterval(animateRect, 10);
+    } else {
+        // Stop the animation
         clearInterval(timerID);
-        running = false;
-        clearCanvas();
-        return;
     }
     
-    // Start the animation
-    running = true;
-    clearCanvas();
-    setStartingPosition();
-    timerID = setInterval(animateRect, 10);  // gets the timer running
+    // reset the running tracker.  
+    running = (!running);
 }
 
 function getCanvas() {
     c = document.getElementById("myCanvas");
-    ctx = c.getContext("2d"); 
+    ctx = c.getContext("2d");
 }
     
 function animateRect() {
     clearCanvas();
-    calculateXPosition();
-    calculateYPosition();
+    setXPosition();
+    setYPosition();
     drawRectangle();
 }
 
@@ -50,50 +53,40 @@ function clearCanvas() {
 function setStartingPosition() {
     rectX = Math.ceil(Math.random() * (c.width - 110));
     rectY = Math.ceil(Math.random() * (c.height - 110));
-    rectWidth = Math.ceil((Math.random() * 100) + 8);
-    rectHeight = Math.ceil((Math.random() * 100) + 8);
+    rectWidth = Math.ceil((Math.random() * 50) + 8);
+    rectHeight = Math.ceil((Math.random() * 50) + 8);
 }
     
-function calculateXPosition() {
-    // Move to the right until we hit the end of the screen, then move back to
-    // the left until we hit the end of the screen.
-    if (movingRight) {
-        rectX++;
-        if ((rectX + rectWidth) == c.width){  // hit the right side of the screen - switch directions
-            movingRight=false;
-        }
-        return;
-    }
-    // we are moving left
-    rectX--;
-    if (rectX==0){  // hit the left side of the screen - switch directions
-        movingRight=true;
-    }
-
+function setXPosition() {
+    // Increment X up or down depending on our direction
+    if (movingRight) rectX++; 
+    else rectX--;
+    
+    // If we've reached the right side then turn around
+    if ((rectX + rectWidth) == c.width) movingRight = false;
+   
+    // If we've reached the left then turn around
+    if (rectX == 0) movingRight = true;
 }
-function calculateYPosition() {
-    // Move down until we hit the end of the canvas, then move back up
-    // until we hit the top of the canvas
-    if (movingDown) {
-        rectY++;
-        if ((rectY + rectHeight) == c.height){  // hit the bottom of the screen - switch directions
-            movingDown=false;
-        }
-        return;
-    }
-    // we are moving Up
-    rectY--;
-    if (rectY==0){  // hit the top of the screen, switch directions
-        movingDown=true;
-    }
+
+function setYPosition() {
+    // Increment Y up or down depending on our direction
+    if (movingDown) rectY++; 
+    else rectY--;
+    
+    // If we've reached the bottom then turn around
+    if ((rectY + rectHeight) == c.height) movingDown = false;
+   
+    // If we've reached the top then turn around
+    if (rectY == 0) movingDown = true;
 
 }
 
 function drawRectangle() {
     // draw the rectangle on the canvas
     ctx.beginPath();
-    ctx.lineWidth = "3";
-    ctx.strokeStyle = "red";
+    ctx.lineWidth = "2";
+    ctx.strokeStyle = "blue";
     ctx.rect(rectX, rectY, rectWidth, rectHeight);
     ctx.stroke();
 }
